@@ -38,13 +38,15 @@ locals {
 }
 
 resource "aws_lb_listener_rule" "listener_rule" {
-  count          = length(local.listener_rules)
-  listener_arn   = aws_lb_listener.listener.arn
-  priority       = count.index + 1
+  count        = length(local.listener_rules)
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = count.index + 1
+
   action {
-    type            = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.target_group[count.index].arn
   }
+
   condition {
     field  = "path-pattern"
     values = [local.listener_rules[count.index].path]
@@ -52,11 +54,11 @@ resource "aws_lb_listener_rule" "listener_rule" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  count     = length(local.listener_rules)
-  name      = "example-target-group-${count.index}"
-  port      = local.listener_rules[count.index].target_port
-  protocol  = "HTTP"
-  vpc_id    = "vpc-0700b3a5d0a8e01dd"
+  count    = length(local.listener_rules)
+  name     = "example-target-group-${count.index}"
+  port     = local.listener_rules[count.index].target_port
+  protocol = "HTTP"
+  vpc_id   = "vpc-0700b3a5d0a8e01dd"
 
   health_check {
     path = "/"
