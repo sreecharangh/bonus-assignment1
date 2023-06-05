@@ -38,7 +38,7 @@ locals {
 }
 
 resource "aws_lb_listener_rule" "listener_rule" {
-  count          = length(locals.listener_rules)
+  count          = length(local.listener_rules)
   listener_arn   = aws_lb_listener.listener.arn
   priority       = count.index + 1
   action {
@@ -47,14 +47,14 @@ resource "aws_lb_listener_rule" "listener_rule" {
   }
   condition {
     field  = "path-pattern"
-    values = [locals.listener_rules[count.index].path]
+    values = [local.listener_rules[count.index].path]
   }
 }
 
 resource "aws_lb_target_group" "target_group" {
-  count     = length(locals.listener_rules)
+  count     = length(local.listener_rules)
   name      = "example-target-group-${count.index}"
-  port      = locals.listener_rules[count.index].target_port
+  port      = local.listener_rules[count.index].target_port
   protocol  = "HTTP"
   vpc_id    = "vpc-0700b3a5d0a8e01dd"
 
