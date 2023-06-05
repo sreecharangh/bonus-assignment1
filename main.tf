@@ -2,21 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Path not found"
-      status_code  = "404"
-    }
-  }
-}
-
 resource "aws_lb" "alb" {
   name               = "example-alb"
   internal           = false
@@ -29,56 +14,81 @@ resource "aws_lb" "alb" {
   }
 }
 
-locals {
-  listener_rules = [
-    { path = "/red", target_port = 8080 },
-    { path = "/blue", target_port = 8081 },
-    { path = "/green", target_port = 8082 },
-  ]
-}
+resource "aws_lb_listener" "listener_red" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
 
-resource "aws_lb_listener_rule" "listener_rule_red" {
-  listener_arn = aws_lb_listener.listener.arn
-  priority     = 100
+  default_action {
+    type             = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Path not found"
+      status_code  = "404"
+    }
+  }
 
-  action {
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_red.arn
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/red"]
+    path_pattern {
+      values = ["/red"]
+    }
   }
 }
 
-resource "aws_lb_listener_rule" "listener_rule_blue" {
-  listener_arn = aws_lb_listener.listener.arn
-  priority     = 200
+resource "aws_lb_listener" "listener_blue" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
 
-  action {
+  default_action {
+    type             = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Path not found"
+      status_code  = "404"
+    }
+  }
+
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_blue.arn
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/blue"]
+    path_pattern {
+      values = ["/blue"]
+    }
   }
 }
 
-resource "aws_lb_listener_rule" "listener_rule_green" {
-  listener_arn = aws_lb_listener.listener.arn
-  priority     = 300
+resource "aws_lb_listener" "listener_green" {
+  load_balancer_arn = aws_lb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
 
-  action {
+  default_action {
+    type             = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Path not found"
+      status_code  = "404"
+    }
+  }
+
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_green.arn
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/green"]
+    path_pattern {
+      values = ["/green"]
+    }
   }
 }
 
