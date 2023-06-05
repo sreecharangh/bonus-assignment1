@@ -54,17 +54,16 @@ resource "aws_lb_listener_rule" "listener_rule" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  count     = length(locals.listener_rules)
+  count     = length(local.listener_rules)  # Updated from locals.listener_rules
   name      = "example-target-group-${count.index}"
-  port      = locals.listener_rules[count.index].target_port
+  port      = local.listener_rules[count.index].target_port  # Updated from locals.listener_rules
   protocol  = "HTTP"
-  vpc_id    = "vpc-0700b3a5d0a8e01dd"  
+  vpc_id    = "vpc-0700b3a5d0a8e01dd"  # Replace with your VPC ID
 
   health_check {
     path = "/"
   }
 }
-
 output "alb_dns_name" {
   value = aws_lb.alb.dns_name
 }
