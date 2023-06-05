@@ -14,7 +14,7 @@ resource "aws_lb" "alb" {
   }
 }
 
-resource "aws_lb_listener" "listener_red" {
+resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
   protocol          = "HTTP"
@@ -27,68 +27,50 @@ resource "aws_lb_listener" "listener_red" {
       status_code  = "404"
     }
   }
+}
 
-  default_action {
+resource "aws_lb_listener_rule" "listener_rule_red" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 100
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_red.arn
   }
 
   condition {
-    path_pattern {
-      values = ["/red"]
-    }
+    field  = "path-pattern"
+    values = ["/red"]
   }
 }
 
-resource "aws_lb_listener" "listener_blue" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+resource "aws_lb_listener_rule" "listener_rule_blue" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 200
 
-  default_action {
-    type             = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Path not found"
-      status_code  = "404"
-    }
-  }
-
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_blue.arn
   }
 
   condition {
-    path_pattern {
-      values = ["/blue"]
-    }
+    field  = "path-pattern"
+    values = ["/blue"]
   }
 }
 
-resource "aws_lb_listener" "listener_green" {
-  load_balancer_arn = aws_lb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+resource "aws_lb_listener_rule" "listener_rule_green" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 300
 
-  default_action {
-    type             = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Path not found"
-      status_code  = "404"
-    }
-  }
-
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group_green.arn
   }
 
   condition {
-    path_pattern {
-      values = ["/green"]
-    }
+    field  = "path-pattern"
+    values = ["/green"]
   }
 }
 
