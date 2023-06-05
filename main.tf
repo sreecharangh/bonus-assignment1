@@ -37,28 +37,78 @@ locals {
   ]
 }
 
-resource "aws_lb_listener_rule" "listener_rule" {
-  count        = length(local.listener_rules)
+resource "aws_lb_listener_rule" "listener_rule_red" {
   listener_arn = aws_lb_listener.listener.arn
-  priority     = count.index + 1
+  priority     = 100
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group[count.index].arn
+    target_group_arn = aws_lb_target_group.target_group_red.arn
   }
 
   condition {
     field  = "path-pattern"
-    values = [local.listener_rules[count.index].path]
+    values = ["/red"]
   }
 }
 
-resource "aws_lb_target_group" "target_group" {
-  count    = length(local.listener_rules)
-  name     = "example-target-group-${count.index}"
-  port     = local.listener_rules[count.index].target_port
-  protocol = "HTTP"
-  vpc_id   = "vpc-0700b3a5d0a8e01dd"
+resource "aws_lb_listener_rule" "listener_rule_blue" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group_blue.arn
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/blue"]
+  }
+}
+
+resource "aws_lb_listener_rule" "listener_rule_green" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 300
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group_green.arn
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["/green"]
+  }
+}
+
+resource "aws_lb_target_group" "target_group_red" {
+  name      = "example-target-group-red"
+  port      = 8080
+  protocol  = "HTTP"
+  vpc_id    = "vpc-0700b3a5d0a8e01dd"
+
+  health_check {
+    path = "/"
+  }
+}
+
+resource "aws_lb_target_group" "target_group_blue" {
+  name      = "example-target-group-blue"
+  port      = 8081
+  protocol  = "HTTP"
+  vpc_id    = "vpc-0700b3a5d0a8e01dd"
+
+  health_check {
+    path = "/"
+  }
+}
+
+resource "aws_lb_target_group" "target_group_green" {
+  name      = "example-target-group-green"
+  port      = 8082
+  protocol  = "HTTP"
+  vpc_id    = "vpc-0700b3a5d0a8e01dd"
 
   health_check {
     path = "/"
